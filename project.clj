@@ -10,7 +10,7 @@
                   :compiler {
                     :output-to "canvas-fn.js"
                     :output-dir "out"
-                    :source-map true
-                    :optimizations :none
+                    :source-map "canvas-fn.js.map"
+                    :optimizations :whitespace
                     :pretty-print true
                     }}]})
