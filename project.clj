@@ -1,17 +1,16 @@
 (defproject canvas-fn "0.1.0-SNAPSHOT"
             :description "Canvas f(u)n"
             :dependencies [[org.clojure/clojure "1.5.1"]
-                           [crate "0.2.4"]
+                           [org.clojure/clojurescript "0.0-2127"]
                            [domina "1.0.1"]]
-            :plugins [[lein-cljsbuild "0.3.0"]]
+            :plugins [[lein-cljsbuild "1.0.1"]]
             :cljsbuild {
               :builds [{
-                  ; The path to the top-level ClojureScript source directory:
-                  :source-paths ["src/cljs"]
-                  ; The standard ClojureScript compiler options:
-                  ; (See the ClojureScript compiler documentation for details.)
+                  :source-paths ["src/canvas_fn"]
                   :compiler {
-                    :output-to "javascripts/main.js"  ; default: target/cljsbuild-main.js
-                    :optimizations :simple
-                    :pretty-print true}}]})
-
+                    :output-to "canvas-fn.js"
+                    :output-dir "out"
+                    :source-map true
+                    :optimizations :none
+                    :pretty-print true
+                    }}]})
