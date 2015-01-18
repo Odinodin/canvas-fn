@@ -3,14 +3,22 @@
             [domina :as dom]
             [canvas-fn.canvas :as canv]
             [canvas-fn.util :as util]
-            [figwheel.client :as fw]
-            ))
+            [figwheel.client :as fw]))
 
 ;; Reference to the canvas element
 (def canvas (dom/by-id "draw-canvas"))
 
 ;; Data to be drawn
-(def model (atom {:ball {:x 0 :y 0}}))
+(def model (atom {:balls [{:x 0 :y 0}
+                          {:x 0 :y 30}
+                          {:x 0 :y 60}
+                          {:x 30 :y 0}
+                          {:x 0 :y 90}
+                          {:x 60 :y 0}
+                          {:x 60 :y 30}
+                          {:x 60 :y 60}
+                          {:x 60 :y 90}
+                          {:x 30 :y 90}]}))
 
 (defn draw-blue-circle [canvas pos]
   (canv/draw-circle canvas pos 10 (str "rgb(200,20,200)")))
@@ -19,24 +27,31 @@
   "Clears canvas and draw a blue circle"
   (do
     (canv/init-canvas canvas)
-    (draw-blue-circle canvas (:ball model))))
+    (doseq [ball (:balls model)]
+      (draw-blue-circle canvas ball))))
 
-(defn move-ball-x [model]
-  (update-in model [:ball :x] (fn [old] (mod (inc old) (. canvas -width)))))
+(defn move-ball-x [ball]
+  (assoc ball :x (mod (inc (:x ball)) (. canvas -width))))
 
-(defn move-ball-y [model]
-  (update-in model [:ball :y] (fn [old] (mod (inc old) (. canvas -height)))))
+(defn move-ball-y [ball]
+  (assoc ball :y (mod (inc (:y ball)) (. canvas -height))))
 
-(defn update-model []
+(defn move-balls [balls]
+  (for [ball balls]
+    (->
+      (move-ball-x ball)
+      move-ball-y)))
+
+(defn update-model [model]
   "Updates the model"
-  (->> @model
-       move-ball-x
-       move-ball-y
+  (->> (:balls @model)
+       (move-balls)
+       (hash-map :balls)
        (reset! model)))
 
 (defn main []
   (do
-    (update-model)
+    (update-model model)
     (render canvas @model)))
 
 ;; This should be extracted into a dev-file, only used in
