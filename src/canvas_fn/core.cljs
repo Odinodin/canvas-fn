@@ -2,7 +2,9 @@
   (:require [clojure.browser.event :as event]
             [domina :as dom]
             [canvas-fn.canvas :as canv]
-            [canvas-fn.util :as util]))
+            [canvas-fn.util :as util]
+            [figwheel.client :as fw]
+            ))
 
 ;; Reference to the canvas element
 (def canvas (dom/by-id "draw-canvas"))
@@ -11,7 +13,7 @@
 (def model (atom {:ball {:x 0 :y 0}}))
 
 (defn draw-blue-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(10,10,255)")))
+  (canv/draw-circle canvas pos 10 (str "rgb(200,20,200)")))
 
 (defn render [canvas model]
   "Clears canvas and draw a blue circle"
@@ -36,6 +38,12 @@
   (do
     (update-model)
     (render canvas @model)))
+
+(fw/start {
+           :on-jsload (fn []
+                        ;; (stop-and-start-my app)
+                        )})
+
 
 (defn animate []
   "Main loop"
