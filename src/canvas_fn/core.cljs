@@ -39,11 +39,12 @@
     (update-model)
     (render canvas @model)))
 
+;; This should be extracted into a dev-file, only used in
+;; Dev mode ..
 (fw/start {
            :on-jsload (fn []
                         ;; (stop-and-start-my app)
                         )})
-
 
 (defn animate []
   "Main loop"

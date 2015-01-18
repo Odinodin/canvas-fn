@@ -13,8 +13,8 @@
 (defn init-canvas [canvas]
   "Clears the canvas"
   (let [ctx (.getContext canvas "2d")
-        width (.getAttribute canvas "width")
-        height (.getAttribute canvas "height")]
+        width (.-width canvas)
+        height (.-height canvas)]
     (do
       (.clearRect ctx 0 0 width height)
       (set! (. ctx -lineWidth) 5)
@@ -32,7 +32,7 @@
     (do
       (set! (. ctx -fillStyle) fill-style)
       (.beginPath ctx)
-      (.arc ctx  (position :x) (position :y) (* 5 radius) 0 (* 2 Math/PI) true)
+      (.arc ctx  (position :x) (position :y) radius 0 (* 2 Math/PI) true)
       (.closePath ctx)
       (.fill ctx))))
 
