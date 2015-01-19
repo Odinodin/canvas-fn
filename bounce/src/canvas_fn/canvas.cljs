@@ -32,7 +32,7 @@
     (do
       (set! (. ctx -fillStyle) fill-style)
       (.beginPath ctx)
-      (.arc ctx  (position :x) (position :y) radius 0 (* 2 Math/PI) true)
+      (.arc ctx  (first position) (second position) radius 0 (* 2 Math/PI) true)
       (.closePath ctx)
       (.fill ctx))))
 

@@ -3,49 +3,53 @@
             [domina :as dom]
             [canvas-fn.canvas :as canv]
             [canvas-fn.util :as util]
+            [canvas-fn.vectors :as v]
             [figwheel.client :as fw]))
 
 ;; Reference to the canvas element
 (def canvas (dom/by-id "draw-canvas"))
 
 ;; Data to be drawn
-(def model (atom {:balls [{:x 0 :y 0}
-                          {:x 0 :y 30}
-                          {:x 0 :y 60}
-                          {:x 30 :y 0}
-                          {:x 0 :y 90}
-                          {:x 60 :y 0}
-                          {:x 60 :y 30}
-                          {:x 60 :y 60}
-                          {:x 60 :y 90}
-                          {:x 30 :y 90}]}))
+(def model (atom {:balls [{:pos [30 0] :velocity [0 0.3] :acceleration [0 0.1]}
+                          {:pos [90 0] :velocity [0 0.3] :acceleration [0 0.02]}
+                          {:pos [120 0] :velocity [0 0.3] :acceleration [0 0.07]}
+                          {:pos [200 0] :velocity [0 0.3] :acceleration [0 0.09]}]}))
 
 (defn draw-blue-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(200,20,200)")))
+  (canv/draw-circle canvas pos 10 (str "rgb(20,20,200)")))
 
 (defn render [canvas model]
   "Clears canvas and draw a blue circle"
   (do
     (canv/init-canvas canvas)
     (doseq [ball (:balls model)]
-      (draw-blue-circle canvas ball))))
+      (draw-blue-circle canvas (:pos ball)))))
 
-(defn move-ball-x [ball]
-  (assoc ball :x (mod (inc (:x ball)) (. canvas -width))))
+(defn accelerate [entities]
+  (for [entity entities]
+    (assoc entity :velocity (v/vplus (:velocity entity) (:acceleration entity)))))
 
-(defn move-ball-y [ball]
-  (assoc ball :y (mod (inc (:y ball)) (. canvas -height))))
+(defn move-entity [entity]
+  (assoc entity :pos (v/vplus (:pos entity) (:velocity entity))))
 
-(defn move-balls [balls]
-  (for [ball balls]
-    (->
-      (move-ball-x ball)
-      move-ball-y)))
+(defn move-entities [entities]
+  (for [entity entities]
+    (move-entity entity)))
+
+(defn hit-floor [entity]
+  ((fn [x] (> x (.-height canvas))) (-> entity :pos second)))
+
+(defn bounce-floor [entities]
+  (for [entity entities]
+    (if (hit-floor entity) (assoc entity :velocity (v/vmult (:velocity entity) -1))
+                           entity)))
 
 (defn update-model [model]
   "Updates the model"
   (->> (:balls @model)
-       (move-balls)
+       (bounce-floor)
+       (accelerate)
+       (move-entities)
        (hash-map :balls)
        (reset! model)))
 
