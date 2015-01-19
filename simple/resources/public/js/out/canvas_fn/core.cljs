@@ -9,7 +9,7 @@
 (def canvas (dom/by-id "draw-canvas"))
 
 ;; Data to be drawn
-(def model (atom {:balls [{:x 0 :y 0}
+(defonce model (atom {:balls [{:x 0 :y 0}
                           {:x 0 :y 30}
                           {:x 0 :y 60}
                           {:x 30 :y 0}
@@ -21,7 +21,7 @@
                           {:x 30 :y 90}]}))
 
 (defn draw-blue-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(200,20,200)")))
+  (canv/draw-circle canvas pos 10 (str "rgb(0,0,0)")))
 
 (defn render [canvas model]
   "Clears canvas and draw a blue circle"
