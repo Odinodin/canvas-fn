@@ -37,7 +37,9 @@
     (move-entity entity)))
 
 (defn hit-floor [entity]
-  ((fn [x] (> x (.-height canvas))) (-> entity :pos second)))
+  (and
+    (> (-> entity :pos second) (.-height canvas))
+    (pos? (-> entity :velocity second))))
 
 (defn bounce-floor [entities]
   (for [entity entities]
