@@ -10,13 +10,20 @@
 (def canvas (dom/by-id "draw-canvas"))
 
 ;; Data to be drawn
-(def model (atom {:balls [{:pos [30 0] :velocity [0 0.3] :acceleration [0 0.1]}
-                          {:pos [90 0] :velocity [0 0.3] :acceleration [0 0.02]}
-                          {:pos [120 0] :velocity [0 0.3] :acceleration [0 0.07]}
-                          {:pos [200 0] :velocity [0 0.3] :acceleration [0 0.09]}]}))
+(def model (atom {:balls [{:pos [30 0] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [60 6] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [90 12] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [120 18] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [150 24] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [180 30] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [210 36] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [240 42] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [270 48] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [300 54] :velocity [0 0.3] :acceleration [0 0.04]}
+                          {:pos [330 60] :velocity [0 0.3] :acceleration [0 0.04]}]}))
 
 (defn draw-blue-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(20,20,200)")))
+  (canv/draw-circle canvas pos 10 (str "rgb(200,200,200)")))
 
 (defn render [canvas model]
   "Clears canvas and draw a blue circle"

@@ -31,10 +31,12 @@
   (let [ctx (.getContext canvas "2d")]
     (do
       (set! (. ctx -fillStyle) fill-style)
+      (set! (. ctx -lineWidth) 4)
       (.beginPath ctx)
       (.arc ctx  (first position) (second position) radius 0 (* 2 Math/PI) true)
       (.closePath ctx)
-      (.fill ctx))))
+      (.fill ctx)
+      (.stroke ctx))))
 
 (defn draw-rect [canvas position width height]
   (let [ctx (.getContext canvas "2d")]
