@@ -10,27 +10,18 @@
 (def canvas (dom/by-id "draw-canvas"))
 
 ;; Data to be drawn
-(def model (atom {:balls [{:pos [30 0] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [60 6] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [90 12] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [120 18] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [150 24] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [180 30] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [210 36] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [240 42] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [270 48] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [300 54] :velocity [0 0.3] :acceleration [0 0.04]}
-                          {:pos [330 60] :velocity [0 0.3] :acceleration [0 0.04]}]}))
+(def model (atom {:balls (for [n (range 1 10)]
+                           {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0.065]})}))
 
-(defn draw-blue-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(200,200,200)")))
+(defn draw-circle [canvas pos]
+  (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(140,140,140)")))
 
 (defn render [canvas model]
-  "Clears canvas and draw a blue circle"
+  "Clears canvas and draws the model"
   (do
     (canv/init-canvas canvas)
     (doseq [ball (:balls model)]
-      (draw-blue-circle canvas (:pos ball)))))
+      (draw-circle canvas (:pos ball)))))
 
 (defn accelerate [entities]
   (for [entity entities]
@@ -43,15 +34,15 @@
   (for [entity entities]
     (move-entity entity)))
 
-(defn hit-floor [entity]
+(defn hit-floor? [entity]
   (and
     (> (-> entity :pos second) (.-height canvas))
     (pos? (-> entity :velocity second))))
 
 (defn bounce-floor [entities]
   (for [entity entities]
-    (if (hit-floor entity) (assoc entity :velocity (v/vmult (:velocity entity) -1))
-                           entity)))
+    (if (hit-floor? entity) (assoc entity :velocity (v/vmult (:velocity entity) -1))
+                            entity)))
 
 (defn update-model [model]
   "Updates the model"
@@ -69,8 +60,7 @@
 
 ;; This should be extracted into a dev-file, only used in
 ;; Dev mode ..
-(fw/start {
-           :on-jsload (fn []
+(fw/start {:on-jsload (fn []
                         ;; (stop-and-start-my app)
                         )})
 

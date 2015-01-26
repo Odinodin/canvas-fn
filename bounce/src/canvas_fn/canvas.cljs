@@ -27,11 +27,12 @@
       (.stroke ctx))))
 
 
-(defn draw-circle [canvas position radius fill-style]
+(defn draw-circle [canvas position radius fill-style line-style]
   (let [ctx (.getContext canvas "2d")]
     (do
       (set! (. ctx -fillStyle) fill-style)
       (set! (. ctx -lineWidth) 4)
+      (set! (. ctx -strokeStyle) line-style)
       (.beginPath ctx)
       (.arc ctx  (first position) (second position) radius 0 (* 2 Math/PI) true)
       (.closePath ctx)
