@@ -13,7 +13,7 @@
                            {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0.065]})}))
 
 (defn draw-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(255,255,255)")))
+  (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(140,140,140)")))
 
 (defn render [canvas model]
   "Clears canvas and draws the model"
