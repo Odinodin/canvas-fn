@@ -26,7 +26,6 @@
       (.lineTo ctx 0 0)
       (.stroke ctx))))
 
-
 (defn draw-circle [canvas position radius fill-style line-style]
   (let [ctx (.getContext canvas "2d")]
     (do

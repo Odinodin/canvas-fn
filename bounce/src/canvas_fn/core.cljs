@@ -3,18 +3,17 @@
             [domina :as dom]
             [canvas-fn.canvas :as canv]
             [canvas-fn.util :as util]
-            [canvas-fn.vectors :as v]
-            [figwheel.client :as fw]))
+            [canvas-fn.vectors :as v]))
 
 ;; Reference to the canvas element
 (def canvas (dom/by-id "draw-canvas"))
 
 ;; Data to be drawn
-(def model (atom {:balls (for [n (range 1 10)]
+(defonce model (atom {:balls (for [n (range 1 10)]
                            {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0.065]})}))
 
 (defn draw-circle [canvas pos]
-  (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(140,140,140)")))
+  (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(255,255,255)")))
 
 (defn render [canvas model]
   "Clears canvas and draws the model"
@@ -47,9 +46,9 @@
 (defn update-model [model]
   "Updates the model"
   (->> (:balls @model)
-       (bounce-floor)
-       (accelerate)
-       (move-entities)
+       bounce-floor
+       accelerate
+       move-entities
        (hash-map :balls)
        (reset! model)))
 
@@ -57,12 +56,6 @@
   (do
     (update-model model)
     (render canvas @model)))
-
-;; This should be extracted into a dev-file, only used in
-;; Dev mode ..
-(fw/start {:on-jsload (fn []
-                        ;; (stop-and-start-my app)
-                        )})
 
 (defn animate []
   "Main loop"
