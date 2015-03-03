@@ -9,5 +9,9 @@ pom.xml.asc
 /.nrepl-port
 
 **/.idea
-**/out/*.*
+**/out
 **/resources/public/*.cljs
+**/target
+
+.lein-repl-history
+figwheel-server.log
