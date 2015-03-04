@@ -11,7 +11,8 @@
 (def info (dom/by-id "info"))
 
 ;; Data to be drawn
-(def model (atom {:balls (for [n (range 1 10)]
+(def model (atom {:attractor {:pos [200 200]}
+                  :balls     (for [n (range 1 10)]
                                {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0.065]})}))
 
 (defn draw-circle [canvas pos]
@@ -21,10 +22,10 @@
   "Clears canvas and draws the model"
   (do
     (canv/init-canvas canvas)
-    (draw-circle canvas [10 20])
+    (draw-circle canvas (:pos (:attractor model)))
     (doseq [ball (:balls model)]
       (draw-circle canvas (:pos ball)))
-    (dom/set-text! info (str "info:" model))))
+    #_(dom/set-text! info (str "info:" model))))
 
 (defn accelerate [entities]
   (for [entity entities]
@@ -37,28 +38,39 @@
   (for [entity entities]
     (move-entity entity)))
 
-(defn hit-floor? [entity]
-  (and
-    (> (-> entity :pos second) (.-height canvas))
-    (pos? (-> entity :velocity second))))
 
-(defn bounce-floor [entities]
-  (for [entity entities]
-    (if (hit-floor? entity) (assoc entity :velocity (v/vmult (:velocity entity) -1))
-                            entity)))
+
+(defn calculate-attraction-force [ball attractor]
+  (let [force-direction (v/vsub (:pos attractor) (:pos ball) )
+        normalized (v/vnormalize force-direction)
+        with-strength (v/vmult normalized 0.002)]
+      with-strength)
+  )
+
+(defn apply-attract-force [balls attractor]
+  (for [ball balls]
+    (assoc ball :acceleration (calculate-attraction-force ball attractor))))
+
+
+(defn accelerate-balls [model]
+  (update-in model [:balls] accelerate))
+
+(defn attract-balls [model]
+  (update-in model [:balls] apply-attract-force (:attractor model)))
+
+(defn move-balls [model]
+  (update-in model [:balls] move-entities))
 
 (defn update-model [model]
   "Updates the model"
-  (->> (:balls @model)
-       bounce-floor
-       accelerate
-       move-entities
-       (hash-map :balls)
-       (reset! model)))
+  (-> model
+      attract-balls
+      accelerate-balls
+      move-balls))
 
 (defn main []
   (do
-    (update-model model)
+    (swap! model update-model)
     (render canvas @model)))
 
 (defn animate []
@@ -67,5 +79,5 @@
     (canv/animate animate)
     (main)))
 
-(util/log "Start animation")
+(util/log "Start animations")
 (animate)

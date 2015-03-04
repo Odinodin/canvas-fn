@@ -3,7 +3,7 @@
 
 (enable-console-print!)
 
-#_(fw/start {
+(fw/start {
            ;; configure a websocket url if yor are using your own server
            ;; :websocket-url "ws://localhost:3449/figwheel-ws"
 
