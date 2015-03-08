@@ -10,10 +10,27 @@
 
 (def info (dom/by-id "info"))
 
+
+
+#_(event/listen canvas "click" #_(dom/set-text! info (str "clicked..,,." (.-pageX %) )))
+
 ;; Data to be drawn
-(def model (atom {:attractor {:pos [200 200]}
-                  :balls     (for [n (range 1 10)]
-                               {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0.065]})}))
+(def model (atom {:attractor {:pos [225 225]}
+                  :balls     (for [n (range 1 20)]
+                               {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0]})}))
+
+;; Interaction handling
+(defn move-attractor-to-mouse [event]
+  (let [canvas-x (- (.-clientX event) (.-offsetLeft canvas))
+        canvas-y (- (.-clientY event) (.-offsetTop canvas))]
+    (swap! model #(assoc-in % [:attractor :pos] [canvas-x canvas-y]))))
+
+(event/listen canvas "click" move-attractor-to-mouse)
+
+;; Rendering
+
+(defn draw-circle-large [canvas pos]
+  (canv/draw-circle canvas pos 20 (str "rgb(180,80,80)") (str "rgb(140,140,140)")))
 
 (defn draw-circle [canvas pos]
   (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(140,140,140)")))
@@ -22,38 +39,30 @@
   "Clears canvas and draws the model"
   (do
     (canv/init-canvas canvas)
-    (draw-circle canvas (:pos (:attractor model)))
     (doseq [ball (:balls model)]
       (draw-circle canvas (:pos ball)))
-    #_(dom/set-text! info (str "info:" model))))
+    (draw-circle-large canvas (:pos (:attractor model)))))
 
-(defn accelerate [entities]
+(defn accelerate-entities [entities]
   (for [entity entities]
     (assoc entity :velocity (v/vplus (:velocity entity) (:acceleration entity)))))
 
-(defn move-entity [entity]
-  (assoc entity :pos (v/vplus (:pos entity) (:velocity entity))))
-
 (defn move-entities [entities]
   (for [entity entities]
-    (move-entity entity)))
-
-
+    (assoc entity :pos (v/vplus (:pos entity) (:velocity entity)))))
 
 (defn calculate-attraction-force [ball attractor]
   (let [force-direction (v/vsub (:pos attractor) (:pos ball) )
         normalized (v/vnormalize force-direction)
-        with-strength (v/vmult normalized 0.002)]
-      with-strength)
-  )
+        with-strength (v/vmult normalized 0.004)]
+      with-strength))
 
 (defn apply-attract-force [balls attractor]
   (for [ball balls]
     (assoc ball :acceleration (calculate-attraction-force ball attractor))))
 
-
 (defn accelerate-balls [model]
-  (update-in model [:balls] accelerate))
+  (update-in model [:balls] accelerate-entities))
 
 (defn attract-balls [model]
   (update-in model [:balls] apply-attract-force (:attractor model)))
