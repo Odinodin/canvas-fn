@@ -10,12 +10,13 @@
 
 (def info (dom/by-id "info"))
 
-
+(def attractor-acceleration 0.009)
+(def max-velocity 1.3)
 
 #_(event/listen canvas "click" #_(dom/set-text! info (str "clicked..,,." (.-pageX %) )))
 
 ;; Data to be drawn
-(def model (atom {:attractor {:pos [225 225]}
+(defonce model (atom {:attractor {:pos [225 225]}
                   :balls     (for [n (range 1 20)]
                                {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0]})}))
 
@@ -45,7 +46,9 @@
 
 (defn accelerate-entities [entities]
   (for [entity entities]
-    (assoc entity :velocity (v/vplus (:velocity entity) (:acceleration entity)))))
+    (assoc entity :velocity (->
+                              (v/vplus (:velocity entity) (:acceleration entity))
+                              (v/vlimit max-velocity)))))
 
 (defn move-entities [entities]
   (for [entity entities]
@@ -54,7 +57,7 @@
 (defn calculate-attraction-force [ball attractor]
   (let [force-direction (v/vsub (:pos attractor) (:pos ball) )
         normalized (v/vnormalize force-direction)
-        with-strength (v/vmult normalized 0.004)]
+        with-strength (v/vmult normalized attractor-acceleration)]
       with-strength))
 
 (defn apply-attract-force [balls attractor]
