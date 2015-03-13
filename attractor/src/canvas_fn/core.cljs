@@ -10,20 +10,21 @@
 
 (def info (dom/by-id "info"))
 
-(def attractor-acceleration 0.009)
-(def max-velocity 1.3)
+(def attractor-acceleration 0.02)
+(def max-velocity 2)
 
 #_(event/listen canvas "click" #_(dom/set-text! info (str "clicked..,,." (.-pageX %) )))
 
 ;; Data to be drawn
 (defonce model (atom {:attractor {:pos [225 225]}
-                  :balls     (for [n (range 1 20)]
-                               {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0]})}))
+                      :balls     (for [n (range 1 20)]
+                                   {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0]})}))
 
 ;; Interaction handling
+;; Compute the position relative to the canvas element and take scrolling into account
 (defn move-attractor-to-mouse [event]
-  (let [canvas-x (- (.-clientX event) (.-offsetLeft canvas))
-        canvas-y (- (.-clientY event) (.-offsetTop canvas))]
+  (let [canvas-x (- (+ (.-clientX event) (.-scrollX js/window)) (.-offsetLeft canvas))
+        canvas-y (- (+ (.-clientY event) (.-scrollY js/window)) (.-offsetTop canvas))]
     (swap! model #(assoc-in % [:attractor :pos] [canvas-x canvas-y]))))
 
 (event/listen canvas "click" move-attractor-to-mouse)
@@ -55,10 +56,10 @@
     (assoc entity :pos (v/vplus (:pos entity) (:velocity entity)))))
 
 (defn calculate-attraction-force [ball attractor]
-  (let [force-direction (v/vsub (:pos attractor) (:pos ball) )
+  (let [force-direction (v/vsub (:pos attractor) (:pos ball))
         normalized (v/vnormalize force-direction)
         with-strength (v/vmult normalized attractor-acceleration)]
-      with-strength))
+    with-strength))
 
 (defn apply-attract-force [balls attractor]
   (for [ball balls]
