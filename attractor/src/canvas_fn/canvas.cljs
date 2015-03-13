@@ -9,22 +9,12 @@
       (.-msRequestAnimationFrame js/window)
       (fn [callback] (js/setTimeout callback 17))))
 
-
 (defn init-canvas [canvas]
   "Clears the canvas"
   (let [ctx (.getContext canvas "2d")
         width (.-width canvas)
         height (.-height canvas)]
-    (do
-      (.clearRect ctx 0 0 width height)
-      (set! (. ctx -lineWidth) 5)
-      (.beginPath ctx)
-      (.moveTo ctx 0 0)
-      (.lineTo ctx 0 height)
-      (.lineTo ctx width height)
-      (.lineTo ctx width 0)
-      (.lineTo ctx 0 0)
-      (.stroke ctx))))
+    (.clearRect ctx 0 0 width height)))
 
 (defn draw-circle [canvas [x y] radius fill-style line-style]
   (let [ctx (.getContext canvas "2d")]
