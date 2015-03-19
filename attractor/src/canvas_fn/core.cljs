@@ -10,14 +10,14 @@
 
 (def info (dom/by-id "info"))
 
-(def attractor-acceleration 0.02)
+(def attractor-acceleration 0.04)
 (def max-velocity 2)
 
 #_(event/listen canvas "click" #_(dom/set-text! info (str "clicked..,,." (.-pageX %) )))
 
 ;; Data to be drawn
-(defonce model (atom {:attractor {:pos [225 225]}
-                      :balls     (for [n (range 1 20)]
+(def model (atom {:attractor {:pos [225 225]}
+                      :balls     (for [n (range 1 30)]
                                    {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0]})}))
 
 ;; Interaction handling
