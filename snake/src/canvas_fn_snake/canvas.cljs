@@ -28,16 +28,11 @@
       (.fill ctx)
       (.stroke ctx))))
 
-(defn draw-rect [canvas [x y] width height fill-style line-style]
+(defn fill-rect [canvas [x y] width height fill-style]
   (let [ctx (.getContext canvas "2d")]
     (do
       (set! (. ctx -fillStyle) fill-style)
-      (set! (. ctx -lineWidth) 4)
-      (set! (. ctx -strokeStyle) line-style)
-      (.beginPath ctx)
-      (.moveTo ctx x y)
-      (.lineTo ctx x (+ y height))
-      (.lineTo ctx (+ x width) (+ y height))
-      (.lineTo ctx (+ x width) y)
-      (.lineTo ctx  x y)
-      (.stroke ctx))))
+      (.fillRect ctx x y width height))))
+
+(defn fill-square [canvas pos width fill-style]
+  (fill-rect canvas pos width width fill-style))
