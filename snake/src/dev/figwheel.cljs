@@ -1,5 +1,7 @@
 (ns dev.figwheel
-  (:require [figwheel.client :as fw :include-macros true]))
+  (:require [figwheel.client :as fw :include-macros true]
+            [cljs.core.async :refer [put!]]
+            [canvas-fn-snake.core :as snake-core]))
 
 (enable-console-print!)
 
@@ -8,7 +10,9 @@
            ;; :websocket-url "ws://localhost:3449/figwheel-ws"
 
            ;; optional callback
-           :on-jsload (fn [] (print "reloaded"))
+           :on-jsload           (fn []
+                                  (put! snake-core/stop-game-chan "stop")
+                                  (print "reloaded"))
 
            ;; The heads up display is enabled by default
            ;; to disable it:
