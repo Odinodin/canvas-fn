@@ -76,6 +76,7 @@
     (main)))
 
 (defn game-loop [stop-chan]
+  "Separate game loop"
   (go-loop []
     (alt! (timeout 1000) (do (swap! model update-model) (recur))
           stop-chan (util/log "Stopping game loop"))))
