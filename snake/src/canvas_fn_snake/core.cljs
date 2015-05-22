@@ -4,10 +4,9 @@
             [canvas-fn-snake.util :as util]
             [canvas-fn-snake.vectors :as v]
             [cljs.core.async :refer [chan <! >! put! close! timeout]])
-  (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]])
-  )
+  (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
-;; Reference to the canvas element
+
 (def canvas (dom/by-id "draw-canvas"))
 
 (def info (dom/by-id "info"))
@@ -17,11 +16,11 @@
              :blue  (str "rgb(20,20,200)")})
 
 (defn empty-board [rows cols]
-  (-> (mapv vec (take rows (partition cols (repeat :empty))))
-      (assoc-in [10 10] :snake-head)))
+  (-> (mapv vec (take rows (partition cols (repeat :empty))))))
 
 ;; Data to be drawn
-(defonce model (atom {:snake-direction :north
+(defonce model (atom {:snake [[5 5] [6 5] [7 5]]
+                      :snake-direction :north
                       :cell-width      20
                       :board           (empty-board 20 20)}))
 
@@ -38,11 +37,12 @@
   (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
 
 (defn draw-board [canvas model]
-  (let [cell-width (:cell-width model)]
-    (doseq [[row-idx row] (map-indexed (fn [idx row] [idx row]) (:board model))]
+
+  (let [board-with-snake (reduce (fn [board snake-coord] (assoc-in board snake-coord :snake-head)) (:board model) (:snake model))
+        cell-width (:cell-width model)]
+    (doseq [[row-idx row] (map-indexed (fn [idx row] [idx row]) board-with-snake)]
       (doseq [[col-idx col] (map-indexed (fn [idx col] [idx col]) row)]
-        (draw-cell canvas col col-idx row-idx cell-width)
-        #_(draw-square canvas [(* row-idx cell-width) (* col-idx cell-width)] (- cell-width 2))))))
+        (draw-cell canvas col col-idx row-idx cell-width)))))
 
 (defn render [canvas model]
   "Clears canvas and draws the model"
@@ -50,35 +50,30 @@
     (canv/init-canvas canvas)
     (draw-board canvas model)))
 
+(defn next-coord [[x y] direction]
+  (case direction
+        :north [x (- y 1)]
+        :south [x (+ y 1)]
+        :east [(+ x 1) y]
+        :west [(- x 1) y]))
 
 (defn move-snake [model]
-  (let [head-pos (for [[x row] (map-indexed (:board model))
-                       [y cell-value] (map-indexed row)
-                       :when (= cell-value :snake-head)]
-                   [x y])]))
+  (let [next (next-coord (-> model :snake last) (:snake-direction model))]
+    (update-in model [:snake] (fn [x] (conj x next)))))
 
 (defn update-model [model]
-  (-> model
-      (assoc-in [:board 2 2] :snake-head)
-      (assoc-in [:board 1 4] :snake-head))
-
-  #_(-> model
-      move-snake))
-
-(defn main []
-  (do
-    (render canvas @model)))
+  (move-snake model))
 
 (defn animate []
   "Main loop"
   (do
     (canv/animate animate)
-    (main)))
+    (render canvas @model)))
 
 (defn game-loop [stop-chan]
   "Separate game loop"
   (go-loop []
-    (alt! (timeout 1000) (do (swap! model update-model) (recur))
+    (alt! (timeout 3000) (do (swap! model update-model) (recur))
           stop-chan (util/log "Stopping game loop"))))
 
 (util/log "Start animations")
