@@ -1,11 +1,12 @@
 (ns canvas-fn-snake.core
   (:require [domina :as dom]
             [canvas-fn-snake.canvas :as canv]
-            [canvas-fn-snake.util :as util]
             [canvas-fn-snake.vectors :as v]
             [cljs.core.async :refer [chan <! >! put! close! timeout]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
+
+(enable-console-print!)
 
 (def canvas (dom/by-id "draw-canvas"))
 
@@ -74,9 +75,9 @@
   "Separate game loop"
   (go-loop []
     (alt! (timeout 3000) (do (swap! model update-model) (recur))
-          stop-chan (util/log "Stopping game loop"))))
+          stop-chan (println "Stopping game loop"))))
 
-(util/log "Start animations")
+(println "Start animations")
 (animate)
 
 ;; Designated channel for stopping the game
