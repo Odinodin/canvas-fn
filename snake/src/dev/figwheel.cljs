@@ -9,6 +9,7 @@
            ;; configure a websocket url if yor are using your own server
            ;; :websocket-url "ws://localhost:3449/figwheel-ws"
 
+           :build-id "dev"
            ;; optional callback
            :on-jsload           (fn []
                                   (put! snake-core/stop-game-chan "stop")

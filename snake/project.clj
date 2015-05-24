@@ -25,6 +25,18 @@
                                              :optimizations :advanced
                                              :pretty-print false
                                              :source-map "resources/public/js/canvas-fn-snake-prod.js.map"}}
+
+                                 {:id "test"
+                                  :source-paths ["src/canvas_fn_snake" "test"]
+                                  :compiler {:output-to "resources/public/js/test/test.js"
+                                             :output-dir "resources/public/js/test/out"
+                                             :optimizations :none
+                                             :main canvas-fn-snake.test-runner
+                                             :asset-path "js/test/out"
+                                             :source-map true
+                                             ;; :source-map-timestamp true
+                                             :cache-analysis true }}
+
                                  ]}
 
             :figwheel {
