@@ -24,12 +24,19 @@
 (def width 20)
 (def height 20)
 
-(defonce model (atom {:snake           [[0 0] [0 1] [0 2]]
-                      :snake-direction :down
-                      :previous-snake-direction :down
-                      :cell-width      20
-                      :apples []
-                      :board           (empty-board width height)}))
+(def initial-state {:game-running true
+                    :snake           [[0 0] [0 1] [0 2]]
+                    :snake-direction :down
+                    :previous-snake-direction :down
+                    :cell-width      20
+                    :apples []
+                    :board           (empty-board width height)})
+
+(defonce model (atom initial-state))
+
+(defn reset-game! []
+  (when (not (:game-running @model))
+    (reset! model initial-state)))
 
 ;; Input
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,14 +45,14 @@
   {37 :left
    38 :up
    39 :right
-   40 :down})
+   40 :down
+   13 :enter})
 
 (defn listen [el type]
   (let [out (chan)]
     (events/listen el type
                    (fn [e] (.preventDefault e) (put! out e)))
     out))
-
 
 (defn opposite-directions? [direction1 direction2]
   (= direction1 ({:up :down
@@ -64,7 +71,11 @@
            (go-loop [] (let [key-event (<! clicks)
                              char-code (.-keyCode key-event)
                              game-key (charcode->keys char-code)]
-                         (when game-key (swap! model #(turn-snake % game-key) #_(assoc % :snake-direction game-key)))
+                         (when game-key
+                           (case game-key
+                             :enter (reset-game!)
+                             (swap! model #(turn-snake % game-key)))
+                           )
                          (recur)))))
 
 ;; Rendering
@@ -92,11 +103,17 @@
       (doseq [[col-idx col] (map-indexed (fn [idx col] [idx col]) row)]
         (draw-cell canvas col col-idx row-idx cell-width)))))
 
+(defn draw-text [model]
+  (if (:game-running model)
+    (dom/set-text! (dom/by-id "info") (str "Snaking!"))
+    (dom/set-text! (dom/by-id "info") (str "Game over! Press enter to restart"))))
+
 (defn render [canvas model]
   "Clears canvas and draws the model"
   (do
     (canv/init-canvas canvas)
-    (draw-board canvas model)))
+    (draw-board canvas model)
+    (draw-text model)))
 
 (defn next-coord [[x y] direction]
   (case direction
@@ -105,12 +122,19 @@
     :right [(+ x 1) y]
     :left [(- x 1) y]))
 
+(defn game-over? [model next-coord]
+  (or (some neg? next-coord)
+      ((fn [[x _]] (>= x width)) next-coord)
+      ((fn [[_ y]] (>= y height)) next-coord)))
+
 (defn move-snake [model]
   (let [next (next-coord (-> model :snake last) (:snake-direction model))]
-    (-> model
-        (assoc :previous-snake-direction (:snake-direction model))
-        (update-in [:snake] (fn [x] (conj x next)))
-        (update-in [:snake] (fn [x] (subvec x 1))))))
+    (if (game-over? model next)
+      (assoc model :game-running false)
+      (-> model
+          (assoc :previous-snake-direction (:snake-direction model))
+          (update-in [:snake] (fn [x] (conj x next)))
+          (update-in [:snake] (fn [x] (subvec x 1)))))))
 
 (defn spawn-apple [model]
   (if (< (rand-int 100) 30)
@@ -122,9 +146,11 @@
     model))
 
 (defn update-model [model]
-  (-> model
-      spawn-apple
-      move-snake))
+  (if (:game-running model)
+    (-> model
+        spawn-apple
+        move-snake)
+    model))
 
 (defn animate []
   "Main loop"
@@ -135,7 +161,7 @@
 (defn game-loop [stop-chan]
   "Separate game loop"
   (go-loop []
-           (alt! (timeout 100) (do (swap! model update-model) (recur))
+           (alt! (timeout 5000) (do (swap! model update-model) (recur))
                  stop-chan (println "Stopping game loop"))))
 
 ;; Start the game
