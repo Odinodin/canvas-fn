@@ -26,6 +26,7 @@
 
 (defonce model (atom {:snake           [[0 0] [0 1] [0 2]]
                       :snake-direction :down
+                      :previous-snake-direction :down
                       :cell-width      20
                       :apples []
                       :board           (empty-board width height)}))
@@ -45,13 +46,25 @@
                    (fn [e] (.preventDefault e) (put! out e)))
     out))
 
+
+(defn opposite-directions? [direction1 direction2]
+  (= direction1 ({:up :down
+                  :down  :up
+                  :left  :right
+                  :right :left} direction2)))
+
+(defn turn-snake [model new-direction]
+  (if (opposite-directions? (:previous-snake-direction model) new-direction)
+    model
+    (assoc model :snake-direction new-direction)))
+
 ;; Only setup once to avoid having to clean up event-handlers when reloading code
 (defonce setup-keyboard-handler
          (let [clicks (listen js/document "keydown")]
            (go-loop [] (let [key-event (<! clicks)
                              char-code (.-keyCode key-event)
                              game-key (charcode->keys char-code)]
-                         (when game-key (swap! model #(assoc % :snake-direction game-key)))
+                         (when game-key (swap! model #(turn-snake % game-key) #_(assoc % :snake-direction game-key)))
                          (recur)))))
 
 ;; Rendering
@@ -95,6 +108,7 @@
 (defn move-snake [model]
   (let [next (next-coord (-> model :snake last) (:snake-direction model))]
     (-> model
+        (assoc :previous-snake-direction (:snake-direction model))
         (update-in [:snake] (fn [x] (conj x next)))
         (update-in [:snake] (fn [x] (subvec x 1))))))
 
@@ -121,7 +135,7 @@
 (defn game-loop [stop-chan]
   "Separate game loop"
   (go-loop []
-           (alt! (timeout 5000) (do (swap! model update-model) (recur))
+           (alt! (timeout 100) (do (swap! model update-model) (recur))
                  stop-chan (println "Stopping game loop"))))
 
 ;; Start the game
