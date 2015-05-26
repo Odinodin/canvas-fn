@@ -21,11 +21,14 @@
   (-> (mapv vec (take rows (partition cols (repeat :empty))))))
 
 ;; Data to be drawn
-(defonce model (atom {:snake           [[5 5] [6 5] [7 5]]
+(def width 20)
+(def height 20)
+
+(defonce model (atom {:snake           [[0 0] [0 1] [0 2]]
                       :snake-direction :down
                       :cell-width      20
-                      :board           (empty-board 20 20)}))
-
+                      :apples []
+                      :board           (empty-board width height)}))
 
 ;; Input
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,16 +63,19 @@
   (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
 
 (defmethod draw-cell :snake-head [canvas cell-value x y cell-width]
-  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
+  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purple colors)))
 
 (defmethod draw-cell :snake-body [canvas cell-value x y cell-width]
+  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purpl colors)))
+
+(defmethod draw-cell :apple [canvas cell-value x y cell-width]
   (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
 
 (defn draw-board [canvas model]
-
   (let [board-with-snake (reduce (fn [board snake-coord] (assoc-in board snake-coord :snake-head)) (:board model) (:snake model))
+        board-with-apples-and-snakes (reduce (fn [board apple-coord] (assoc-in board apple-coord :apple)) board-with-snake (:apples model))
         cell-width (:cell-width model)]
-    (doseq [[row-idx row] (map-indexed (fn [idx row] [idx row]) board-with-snake)]
+    (doseq [[row-idx row] (map-indexed (fn [idx row] [idx row]) board-with-apples-and-snakes)]
       (doseq [[col-idx col] (map-indexed (fn [idx col] [idx col]) row)]
         (draw-cell canvas col col-idx row-idx cell-width)))))
 
@@ -88,10 +94,23 @@
 
 (defn move-snake [model]
   (let [next (next-coord (-> model :snake last) (:snake-direction model))]
-    (update-in model [:snake] (fn [x] (conj x next)))))
+    (-> model
+        (update-in [:snake] (fn [x] (conj x next)))
+        (update-in [:snake] (fn [x] (subvec x 1))))))
+
+(defn spawn-apple [model]
+  (if (< (rand-int 100) 30)
+    (let [all-coord-set (into #{} (for [x (range 0 width) y (range 0 height)] [x y]))
+          snake-coord-set (into #{} (:snake model))
+          available-coords (-> (clojure.set/difference all-coord-set snake-coord-set) vec)
+          random-spawn-coord (get available-coords (-> (count available-coords) rand-int))]
+      (update-in model [:apples] (fn [apples] (conj apples random-spawn-coord))))
+    model))
 
 (defn update-model [model]
-  (move-snake model))
+  (-> model
+      spawn-apple
+      move-snake))
 
 (defn animate []
   "Main loop"
@@ -105,8 +124,7 @@
            (alt! (timeout 5000) (do (swap! model update-model) (recur))
                  stop-chan (println "Stopping game loop"))))
 
-
 ;; Start the game
-(defonce stop-game-chan (chan)) ;; Designated channel for stopping the game from Figwheel when reloading code
+(defonce stop-game-chan (chan))                             ;; Designated channel for stopping the game from Figwheel when reloading code
 (game-loop stop-game-chan)
 (animate)
