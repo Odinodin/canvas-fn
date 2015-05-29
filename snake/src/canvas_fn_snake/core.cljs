@@ -80,27 +80,28 @@
 ;; Rendering
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmulti draw-cell (fn [canvas cell-value x y cell-width] cell-value))
+(defmulti draw-cell (fn [ctx cell-value x y cell-width] cell-value))
 
-(defmethod draw-cell :empty [canvas cell-value x y cell-width]
-  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
+(defmethod draw-cell :empty [ctx cell-value x y cell-width]
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
 
-(defmethod draw-cell :snake-head [canvas cell-value x y cell-width]
-  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purple colors)))
+(defmethod draw-cell :snake-head [ctx cell-value x y cell-width]
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purple colors)))
 
-(defmethod draw-cell :snake-body [canvas cell-value x y cell-width]
-  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
+(defmethod draw-cell :snake-body [ctx cell-value x y cell-width]
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
 
-(defmethod draw-cell :apple [canvas cell-value x y cell-width]
-  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
+(defmethod draw-cell :apple [ctx cell-value x y cell-width]
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
 
 (defn draw-board [canvas model]
-  (let [board-with-snake (reduce (fn [board snake-coord] (assoc-in board snake-coord :snake-head)) (:board model) (:snake model))
+  (let [ctx (.getContext canvas "2d")
+        board-with-snake (reduce (fn [board snake-coord] (assoc-in board snake-coord :snake-head)) (:board model) (:snake model))
         board-with-apples-and-snakes (reduce (fn [board apple-coord] (assoc-in board apple-coord :apple)) board-with-snake (:apples model))
         cell-width (:cell-width model)]
     (doseq [[row-idx row] (map-indexed (fn [idx row] [idx row]) board-with-apples-and-snakes)]
       (doseq [[col-idx col] (map-indexed (fn [idx col] [idx col]) row)]
-        (draw-cell canvas col col-idx row-idx cell-width)))))
+        (draw-cell ctx col col-idx row-idx cell-width)))))
 
 (defn draw-text [model]
   (if (:game-running model)

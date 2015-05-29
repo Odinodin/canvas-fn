@@ -28,11 +28,10 @@
       (.fill ctx)
       (.stroke ctx))))
 
-(defn fill-rect [canvas [x y] width height fill-style]
-  (let [ctx (.getContext canvas "2d")]
-    (do
-      (set! (. ctx -fillStyle) fill-style)
-      (.fillRect ctx x y width height))))
+(defn fill-rect [ctx [x y] width height fill-style]
+  (do
+    (set! (. ctx -fillStyle) fill-style)
+    (.fillRect ctx x y width height)))
 
-(defn fill-square [canvas pos width fill-style]
-  (fill-rect canvas pos width width fill-style))
+(defn fill-square [ctx pos width fill-style]
+  (fill-rect ctx pos width width fill-style))
