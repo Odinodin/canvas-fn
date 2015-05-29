@@ -24,13 +24,14 @@
 (def width 20)
 (def height 20)
 
-(def initial-state {:game-running true
-                    :snake           [[0 0] [0 1] [0 2]]
-                    :snake-direction :down
+(def initial-state {:game-running             true
+                    :snake                    [[0 0] [0 1] [0 2]]
+                    :snake-direction          :down
                     :previous-snake-direction :down
-                    :cell-width      20
-                    :apples #{}
-                    :board           (empty-board width height)})
+                    :cell-width               20
+                    :apples                   #{}
+                    :growing                  false
+                    :board                    (empty-board width height)})
 
 (defonce model (atom initial-state))
 
@@ -55,7 +56,7 @@
     out))
 
 (defn opposite-directions? [direction1 direction2]
-  (= direction1 ({:up :down
+  (= direction1 ({:up    :down
                   :down  :up
                   :left  :right
                   :right :left} direction2)))
@@ -127,6 +128,12 @@
       ((fn [[x _]] (>= x width)) next-coord)
       ((fn [[_ y]] (>= y height)) next-coord)))
 
+
+(defn- move-snake-tail [model]
+  (if-not (:growing model)
+    (update-in model [:snake] (fn [x] (subvec x 1)))
+    model))
+
 (defn move-snake [model]
   (let [next (next-coord (-> model :snake last) (:snake-direction model))]
     (if (game-over? model next)
@@ -134,7 +141,9 @@
       (-> model
           (assoc :previous-snake-direction (:snake-direction model))
           (update-in [:snake] (fn [x] (conj x next)))
-          (update-in [:snake] (fn [x] (subvec x 1)))))))
+          (move-snake-tail)
+          (assoc :growing false))
+      )))
 
 (defn spawn-apple [model]
   (if (< (rand-int 100) 30)
@@ -149,9 +158,10 @@
   (let [snake-head (last (:snake model))
         apples (:apples model)]
     (if (contains? apples snake-head)
-      (update-in model [:apples] #(disj % snake-head))
+      (-> model
+          (assoc :apples (disj apples snake-head))
+          (assoc :growing true))
       model)))
-
 
 (defn update-model [model]
   (if (:game-running model)
