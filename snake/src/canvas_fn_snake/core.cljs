@@ -29,7 +29,7 @@
                     :snake-direction :down
                     :previous-snake-direction :down
                     :cell-width      20
-                    :apples []
+                    :apples #{}
                     :board           (empty-board width height)})
 
 (defonce model (atom initial-state))
@@ -90,7 +90,7 @@
   (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purple colors)))
 
 (defmethod draw-cell :snake-body [canvas cell-value x y cell-width]
-  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purpl colors)))
+  (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
 
 (defmethod draw-cell :apple [canvas cell-value x y cell-width]
   (canv/fill-square canvas [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
@@ -145,11 +145,20 @@
       (update-in model [:apples] (fn [apples] (conj apples random-spawn-coord))))
     model))
 
+(defn eat-apple [model]
+  (let [snake-head (last (:snake model))
+        apples (:apples model)]
+    (if (contains? apples snake-head)
+      (update-in model [:apples] #(disj % snake-head))
+      model)))
+
+
 (defn update-model [model]
   (if (:game-running model)
     (-> model
-        spawn-apple
-        move-snake)
+        move-snake
+        eat-apple
+        spawn-apple)
     model))
 
 (defn animate []
