@@ -10,10 +10,12 @@
 
 (def canvas (dom/by-id "draw-canvas"))
 
-(def colors {:purple (str "rgb(186,85,211)")
-             :green  (str "rgb(20,200,20)")
-             :red    (str "rgb(120,20,20)")
-             :blue   (str "rgb(20,20,200)")})
+(def colors {:grey-seethrough "rgba(100,100,100,0.6)"
+             :dark-grey       "rgb(30,30,30)"
+             :purple          "rgb(186,85,211)"
+             :green           "rgb(50,180,20)"
+             :red             "rgb(120,20,20)"
+             :blue            "rgb(20,20,200)"})
 
 (defn empty-board [rows cols]
   (-> (mapv vec (take rows (partition cols (repeat :empty))))))
@@ -83,10 +85,10 @@
 (defmulti draw-cell (fn [ctx cell-value x y cell-width] cell-value))
 
 (defmethod draw-cell :empty [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:dark-grey colors)))
 
 (defmethod draw-cell :snake-head [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:purple colors)))
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
 
 (defmethod draw-cell :snake-body [ctx cell-value x y cell-width]
   (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
@@ -104,9 +106,11 @@
         (draw-cell ctx col col-idx row-idx cell-width)))))
 
 (defn draw-text [model]
-  (if (:game-running model)
-    (dom/set-text! (dom/by-id "info") (str "Snaking!"))
-    (dom/set-text! (dom/by-id "info") (str "Game over! Press enter to restart"))))
+  (when-not (:game-running model)
+    (do
+      (canv/fill-rect (.getContext canvas "2d") [5 90] 380 120 (:grey-seethrough colors))
+      (canv/text-large (.getContext canvas "2d") [10 150] "GAME OVER" (:dark-grey colors))
+      (canv/text-small (.getContext canvas "2d") [40 200] "Press enter to retry" (:dark-grey colors)))))
 
 (defn render [canvas model]
   "Clears canvas and draws the model"
