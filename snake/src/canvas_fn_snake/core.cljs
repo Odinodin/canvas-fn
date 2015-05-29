@@ -10,8 +10,6 @@
 
 (def canvas (dom/by-id "draw-canvas"))
 
-(def info (dom/by-id "info"))
-
 (def colors {:purple (str "rgb(186,85,211)")
              :green  (str "rgb(20,200,20)")
              :red    (str "rgb(120,20,20)")
@@ -126,7 +124,10 @@
 (defn game-over? [model next-coord]
   (or (some neg? next-coord)
       ((fn [[x _]] (>= x width)) next-coord)
-      ((fn [[_ y]] (>= y height)) next-coord)))
+      ((fn [[_ y]] (>= y height)) next-coord)
+      (let [snake-head (-> model :snake last)]
+        (> (count (filter #{snake-head} (:snake model)))
+           1))))
 
 
 (defn- move-snake-tail [model]
@@ -142,8 +143,7 @@
           (assoc :previous-snake-direction (:snake-direction model))
           (update-in [:snake] (fn [x] (conj x next)))
           (move-snake-tail)
-          (assoc :growing false))
-      )))
+          (assoc :growing false)))))
 
 (defn spawn-apple [model]
   (if (< (rand-int 100) 30)
@@ -177,10 +177,11 @@
     (canv/animate animate)
     (render canvas @model)))
 
+
 (defn game-loop [stop-chan]
   "Separate game loop"
   (go-loop []
-           (alt! (timeout 5000) (do (swap! model update-model) (recur))
+           (alt! (timeout 40) (do (swap! model update-model) (recur))
                  stop-chan (println "Stopping game loop"))))
 
 ;; Start the game
