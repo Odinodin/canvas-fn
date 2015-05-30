@@ -3,6 +3,7 @@
             [canvas-fn-snake.canvas :as canv]
             [canvas-fn-snake.vectors :as v]
             [goog.events :as events]
+            clojure.set
             [cljs.core.async :refer [chan <! >! put! close! timeout]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
@@ -13,8 +14,8 @@
 (def colors {:grey-seethrough "rgba(100,100,100,0.6)"
              :dark-grey       "rgb(30,30,30)"
              :purple          "rgb(186,85,211)"
-             :green           "rgb(50,180,20)"
-             :red             "rgb(120,20,20)"
+             :green           "rgb(50,180,100)"
+             :red             "rgb(244,116,114)"
              :blue            "rgb(20,20,200)"})
 
 (defn empty-board [rows cols]
