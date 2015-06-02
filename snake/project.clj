@@ -1,11 +1,11 @@
 (defproject canvas-fn-snake "0.1.0-SNAPSHOT"
             :description "Canvas fn - Snake"
             :dependencies [[org.clojure/clojure "1.6.0"]
-                           [org.clojure/clojurescript "0.0-3211"]
+                           [org.clojure/clojurescript "0.0-3269"]
                            [domina "1.0.3"]
-                           [figwheel "0.3.1"]]
+                           [figwheel "0.3.3"]]
             :plugins [[lein-cljsbuild "1.0.5"]
-                      [lein-figwheel "0.3.1"]]
+                      [lein-figwheel "0.3.3"]]
 
             :jvm-opts ["-Xmx1G"]
 
