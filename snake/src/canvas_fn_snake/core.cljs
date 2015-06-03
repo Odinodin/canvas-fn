@@ -161,6 +161,7 @@
     model))
 
 (defn eat-apple [model]
+  "Eat an apple if the snake head is on an apple"
   (let [snake-head (last (:snake model))
         apples (:apples model)]
     (if (contains? apples snake-head)
@@ -191,6 +192,6 @@
                  stop-chan (println "Stopping game loop"))))
 
 ;; Start the game
-(defonce stop-game-chan (chan))                             ;; Designated channel for stopping the game from Figwheel when reloading code
+(defonce stop-game-chan (chan)) ;; Designated channel for stopping the game from Figwheel when reloading code
 (game-loop stop-game-chan)
 (animate)
