@@ -128,6 +128,7 @@
     :left [(- x 1) y]))
 
 (defn game-over? [model next-coord]
+  "Check if the game is over"
   (or (some neg? next-coord)
       ((fn [[x _]] (>= x width)) next-coord)
       ((fn [[_ y]] (>= y height)) next-coord)
