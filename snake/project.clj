@@ -12,7 +12,12 @@
             :cljsbuild {
                         :builds [{:id           "dev"
                                   :source-paths ["src/canvas_fn_snake" "src/dev"]
-                                  :compiler     {:output-to     "resources/public/js/canvas-fn-snake.js"
+                                  ;; Enable figwheel
+                                  :figwheel {:on-jsload "dev.figwheel/reload-hook"}
+
+                                  :compiler     {:main "canvas-fn-snake.core"
+                                                 :asset-path "js/out"
+                                                 :output-to     "resources/public/js/canvas-fn-snake.js"
                                                  :output-dir    "resources/public/js/out"
                                                  :optimizations :none
                                                  :source-map    true
@@ -20,6 +25,8 @@
                                  {:id "release"
                                   :source-paths ["src/canvas_fn_snake"]
                                   :compiler {
+                                             :main "canvas-fn-snake.core"
+                                             :asset-path "js/out"
                                              :output-to "resources/public/js/canvas-fn-snake-prod.js"
                                              :output-dir "resources/public/js/prod-out"
                                              :optimizations :advanced
@@ -28,6 +35,7 @@
 
                                  {:id "test"
                                   :source-paths ["src/canvas_fn_snake" "test"]
+                                  :figwheel {:on-jsload "dev.figwheel/reload-hook"}
                                   :compiler {:output-to "resources/public/js/test/test.js"
                                              :output-dir "resources/public/js/test/out"
                                              :optimizations :none
