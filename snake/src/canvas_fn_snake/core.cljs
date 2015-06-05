@@ -1,7 +1,6 @@
 (ns canvas-fn-snake.core
   (:require [domina :as dom]
             [canvas-fn-snake.canvas :as canv]
-            [canvas-fn-snake.vectors :as v]
             [goog.events :as events]
             clojure.set
             [cljs.core.async :refer [chan <! >! put! close! timeout]])
@@ -135,7 +134,6 @@
       (let [snake-head (-> model :snake last)]
         (> (count (filter #{snake-head} (:snake model)))
            1))))
-
 
 (defn- move-snake-tail [model]
   (if-not (:growing model)

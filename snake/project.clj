@@ -1,7 +1,7 @@
 (defproject canvas-fn-snake "0.1.0-SNAPSHOT"
             :description "Canvas fn - Snake"
-            :dependencies [[org.clojure/clojure "1.6.0"]
-                           [org.clojure/clojurescript "0.0-3269"]
+            :dependencies [[org.clojure/clojure "1.7.0-RC1"]
+                           [org.clojure/clojurescript "0.0-3308"]
                            [domina "1.0.3"]
                            [figwheel "0.3.3"]]
             :plugins [[lein-cljsbuild "1.0.5"]
