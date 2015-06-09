@@ -1,1 +1,0 @@
-{"version":3,"file":"\/Users\/odinholestandal\/git\/odin\/canvas-fn\/resources\/public\/canvas_fn\/util.js","sources":["util.cljs"],"lineCount":31,"mappings":";AAAA;;;;AAEA;;;qBAAA,rBAAMA;8BAAOC;AAAb,AACE,OAAMC,YAAW,AAACC,0BAAMC,cAAIH;;;IADjBA;;;;EAAAA;;+BAAAA;;;IAAAA;qBAAAA","names":["canvas-fn.util\/log","items","js\/console","cljs.core\/apply","cljs.core\/str"]}

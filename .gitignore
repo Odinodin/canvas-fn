@@ -1,17 +1,26 @@
-/target
-/classes
-/checkouts
+target/
+classes/
+checkouts/
 pom.xml
 pom.xml.asc
 *.jar
 *.class
 /.lein-*
 /.nrepl-port
+.repl
 
 **/.idea
 **/out
 **/resources/public/*.cljs
 **/target
+js
+prod-out/
 
 .lein-repl-history
 figwheel-server.log
+
+# Mac OS
+.DS_Store
+
+# Figwheel
+figwheel_server.log
