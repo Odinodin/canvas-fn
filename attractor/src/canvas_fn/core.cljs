@@ -16,7 +16,7 @@
 #_(event/listen canvas "click" #_(dom/set-text! info (str "clicked..,,." (.-pageX %) )))
 
 ;; Data to be drawn
-(def model (atom {:attractor {:pos [225 225]}
+(defonce model (atom {:attractor {:pos [225 225]}
                       :balls     (for [n (range 1 30)]
                                    {:pos [(* n 40) (* n 10)] :velocity [0 0.3] :acceleration [0 0]})}))
 
@@ -32,7 +32,7 @@
 ;; Rendering
 
 (defn draw-circle-large [canvas pos]
-  (canv/draw-circle canvas pos 20 (str "rgb(180,80,80)") (str "rgb(140,140,140)")))
+  (canv/draw-circle canvas pos 20 (str "rgb(200,80,80)") (str "rgb(140,140,140)")))
 
 (defn draw-circle [canvas pos]
   (canv/draw-circle canvas pos 10 (str "rgb(50,50,50)") (str "rgb(140,140,140)")))
