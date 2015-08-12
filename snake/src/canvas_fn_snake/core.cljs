@@ -183,14 +183,13 @@
     (canv/animate animate)
     (render canvas @model)))
 
-
-(defn game-loop [stop-chan]
-  "Separate game loop"
-  (go-loop []
-           (alt! (timeout 40) (do (swap! model update-model) (recur))
-                 stop-chan (println "Stopping game loop"))))
+(def speed 5000)
 
 ;; Start the game
-(defonce stop-game-chan (chan)) ;; Designated channel for stopping the game from Figwheel when reloading code
-(game-loop stop-game-chan)
-(animate)
+(defonce game-loop
+         (go-loop []
+                  (<! (timeout speed))
+                  (swap! model update-model)
+                  (recur)))
+
+(defonce u (animate))

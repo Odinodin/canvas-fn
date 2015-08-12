@@ -49,7 +49,7 @@
 
             :figwheel {
                        :http-server-root "public"           ;; default and assumes "resources"
-                       :server-port      3449               ;; default
+                       :server-port      4000               ;; default
                        :css-dirs         ["resources/public/css"] ;; watch and update CSS
 
-                       :nrepl-port 7888})
+                       :nrepl-port 4444})

@@ -4,5 +4,5 @@
 
 (defn reload-hook []
   (fn []
-    (put! snake-core/stop-game-chan "stop")
+    #_(put! snake-core/stop-game-chan "stop")
     (print "reloaded")))
