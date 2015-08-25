@@ -3,7 +3,9 @@
             [canvas-fn-snake.canvas :as canv]
             [goog.events :as events]
             clojure.set
-            [cljs.core.async :refer [chan <! >! put! close! timeout]])
+            [cljs.core.async :refer [chan <! >! put! close! timeout]]
+            [quiescent.core :as q]
+            [quiescent.dom :as d])
   (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
 (enable-console-print!)
@@ -112,12 +114,13 @@
       (canv/text-large (.getContext canvas "2d") [10 150] "GAME OVER" (:dark-grey colors))
       (canv/text-small (.getContext canvas "2d") [40 200] "Press enter to retry" (:dark-grey colors)))))
 
-(defn render [canvas model]
+(defn render-canvas [canvas model]
   "Clears canvas and draws the model"
   (do
     (canv/init-canvas canvas)
     (draw-board canvas model)
     (draw-text model)))
+
 
 (defn next-coord [[x y] direction]
   (case direction
@@ -177,13 +180,31 @@
         spawn-apple)
     model))
 
+
+;; TODO fix this ....
+;; The problem is that the canvas element is refered to in the (def canvas ... ) it must be shipped in instead .. :)
+;;
+
+(defn render-html []
+  (q/render
+    (d/div {}
+           (d/h1 {:style {:color "White"}}
+                 "Hello")
+           (d/canvas {:id "draw-canvas" :width "450px" :height "450px"} ""))
+
+    (.getElementById js/document "main")
+    )
+  )
+
 (defn animate []
   "Main loop"
   (do
+    (render-html)
     (canv/animate animate)
-    (render canvas @model)))
 
-(def speed 5000)
+    (render-canvas canvas @model)))
+
+(def speed 40)
 
 ;; Start the game
 (defonce game-loop
@@ -193,3 +214,4 @@
                   (recur)))
 
 (defonce u (animate))
+

@@ -1,9 +1,10 @@
 (defproject canvas-fn-snake "0.1.0-SNAPSHOT"
             :description "Canvas fn - Snake"
-            :dependencies [[org.clojure/clojure "1.7.0-RC1"]
-                           [org.clojure/clojurescript "0.0-3308"]
+            :dependencies [[org.clojure/clojure "1.7.0"]
+                           [org.clojure/clojurescript "1.7.48"]
                            [domina "1.0.3"]
-                           [figwheel "0.3.3"]]
+                           [figwheel "0.3.3"]
+                           [quiescent "0.2.0-RC2"]]
             :plugins [[lein-cljsbuild "1.0.5"]
                       [lein-figwheel "0.3.3"]]
 
@@ -21,31 +22,7 @@
                                                  :output-dir    "resources/public/js/out"
                                                  :optimizations :none
                                                  :source-map    true
-                                                 :pretty-print  true}}
-                                 {:id "release"
-                                  :source-paths ["src/canvas_fn_snake"]
-                                  :compiler {
-                                             :main "canvas-fn-snake.core"
-                                             :asset-path "js/out"
-                                             :output-to "resources/public/js/canvas-fn-snake-prod.js"
-                                             :output-dir "resources/public/js/prod-out"
-                                             :optimizations :advanced
-                                             :pretty-print false
-                                             :source-map "resources/public/js/canvas-fn-snake-prod.js.map"}}
-
-                                 {:id "test"
-                                  :source-paths ["src/canvas_fn_snake" "test"]
-                                  :figwheel {:on-jsload "dev.figwheel/reload-hook"}
-                                  :compiler {:output-to "resources/public/js/test/test.js"
-                                             :output-dir "resources/public/js/test/out"
-                                             :optimizations :none
-                                             :main canvas-fn-snake.test-runner
-                                             :asset-path "js/test/out"
-                                             :source-map true
-                                             ;; :source-map-timestamp true
-                                             :cache-analysis true }}
-
-                                 ]}
+                                                 :pretty-print  true}}]}
 
             :figwheel {
                        :http-server-root "public"           ;; default and assumes "resources"
