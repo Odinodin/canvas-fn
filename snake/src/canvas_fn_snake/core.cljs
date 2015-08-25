@@ -10,8 +10,6 @@
 
 (enable-console-print!)
 
-(def canvas (dom/by-id "draw-canvas"))
-
 (def colors {:grey-seethrough "rgba(100,100,100,0.6)"
              :dark-grey       "rgb(30,30,30)"
              :purple          "rgb(186,85,211)"
@@ -35,7 +33,7 @@
                     :growing                  false
                     :board                    (empty-board width height)})
 
-(defonce model (atom initial-state))
+(def model (atom initial-state))
 
 (defn reset-game! []
   (when (not (:game-running @model))
@@ -107,7 +105,7 @@
       (doseq [[col-idx col] (map-indexed (fn [idx col] [idx col]) row)]
         (draw-cell ctx col col-idx row-idx cell-width)))))
 
-(defn draw-text [model]
+(defn draw-text [canvas model]
   (when-not (:game-running model)
     (do
       (canv/fill-rect (.getContext canvas "2d") [5 90] 380 120 (:grey-seethrough colors))
@@ -119,8 +117,7 @@
   (do
     (canv/init-canvas canvas)
     (draw-board canvas model)
-    (draw-text model)))
-
+    (draw-text canvas model)))
 
 (defn next-coord [[x y] direction]
   (case direction
@@ -180,21 +177,13 @@
         spawn-apple)
     model))
 
-
-;; TODO fix this ....
-;; The problem is that the canvas element is refered to in the (def canvas ... ) it must be shipped in instead .. :)
-;;
-
 (defn render-html []
   (q/render
     (d/div {}
-           (d/h1 {:style {:color "White"}}
-                 "Hello")
+           (d/h1 {:style {:color "grey"}}
+                 "snake")
            (d/canvas {:id "draw-canvas" :width "450px" :height "450px"} ""))
-
-    (.getElementById js/document "main")
-    )
-  )
+    (.getElementById js/document "main")))
 
 (defn animate []
   "Main loop"
@@ -202,9 +191,9 @@
     (render-html)
     (canv/animate animate)
 
-    (render-canvas canvas @model)))
+    (render-canvas (dom/by-id "draw-canvas") @model)))
 
-(def speed 40)
+(def speed 2000)
 
 ;; Start the game
 (defonce game-loop
