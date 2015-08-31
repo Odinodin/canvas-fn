@@ -5,6 +5,7 @@
             clojure.set
             [cljs.core.async :refer [chan <! >! put! close! timeout]]
             [quiescent.core :as q]
+            [cljs.pprint :refer [pprint] ]
             [quiescent.dom :as d])
   (:require-macros [cljs.core.async.macros :refer [go go-loop alt!]]))
 
@@ -27,9 +28,6 @@
 ;; Data to be drawn
 (def width 20)
 (def height 20)
-
-
-
 
 (def initial-state {:game-running             true
                     :snake                    [[0 0] [0 1] [0 2]]
@@ -160,7 +158,7 @@
           (assoc :growing false)))))
 
 (defn spawn-apple [model]
-  (if (< (rand-int 100) 30)
+  (if (< (rand-int 100) 50)
     (let [all-coord-set (into #{} (for [x (range 0 width) y (range 0 height)] [x y]))
           snake-coord-set (into #{} (:snake model))
           available-coords (-> (clojure.set/difference all-coord-set snake-coord-set) vec)
@@ -195,9 +193,9 @@
 
 (q/defcomponent Position-table [positions title]
                 (d/table
-                  {:style {:borderCollapse "collapse"}}
+                  {}
                   (d/thead
-                    {:style {:backgroundColor "grey"}}
+                    {}
                     (d/tr
                       {}
                       (d/th {:colSpan 2} title))
@@ -211,15 +209,15 @@
 (defn render-html [model]
   (q/render
     (d/div {}
-           (d/h1 {:style {:color "grey"}}
-                 (str "Game over? " (not (:game-running model))))
-           (d/h1 {:style {:color "grey"}}
-                 (str "Snake direction " (:snake-direction model)))
-           (d/canvas {:id "draw-canvas" :width "450px" :height "450px"} "")
-           (str "Snake: " (seq (:snake model)))
-           (str "Apples: " (seq (:apples model)))
-           (Position-table (:snake model) "Snake")
-           (Position-table (:apples model) "Apples "))
+           (d/div {:style {:display "flex" :align-items "center" :flex-flow "column"}}
+                  #_(d/h1 {:style {:color "grey"} }
+                        (str "Game over? " (not (:game-running model)) ))
+                  #_(d/h1 {:style {:color "grey"}}
+                        (str "Snake direction: " (-> model :snake-direction name))))
+           #_(d/canvas {:id "draw-canvas" :width "400px" :height "400px"} "")
+           (d/div {:style {:display "flex" :justify-content "center"}}
+                  #_(Position-table (:snake model) "Snake")
+                  #_(Position-table (:apples model) "Apples ")))
     (.getElementById js/document "main")))
 
 

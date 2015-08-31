@@ -6,5 +6,24 @@ body {
 canvas {
     display: block;
     margin: 0 auto;
-    width: 500px;
+    width: 400px;
+}
+
+
+table {
+    width: 5em;
+    border-collapse: collapse;
+    margin: 1em;
+}
+
+th, td {
+    text-align: center;
+}
+
+thead {
+    background-color: darkgray;
+}
+
+h1 {
+    margin: 0.1em
 }
