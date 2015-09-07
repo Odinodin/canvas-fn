@@ -18,7 +18,7 @@
              :grey            "rgb(200,200,200)"
              :purple          "rgb(186,85,211)"
              :green           "rgb(90,180,100)"
-             :dark-green      "rgb(50,200,80)"
+             :yellow          "rgb(255,255,102)"
              :red             "rgb(244,116,114)"
              :blue            "rgb(20,20,200)"})
 
@@ -93,8 +93,7 @@
   (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:grey colors)))
 
 (defmethod draw-cell :snake-head [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:dark-green colors
-                                                                               )))
+  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
 
 (defmethod draw-cell :snake-body [ctx cell-value x y cell-width]
   (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
@@ -209,17 +208,18 @@
 (defn render-html [model]
   (q/render
     (d/div {}
-           (d/div {:style {:display "flex" :align-items "center" :flex-flow "column"}}
-                  #_(d/h1 {:style {:color "grey"} }
-                        (str "Game over? " (not (:game-running model)) ))
-                  #_(d/h1 {:style {:color "grey"}}
-                        (str "Snake direction: " (-> model :snake-direction name))))
-           #_(d/canvas {:id "draw-canvas" :width "400px" :height "400px"} "")
-           (d/div {:style {:display "flex" :justify-content "center"}}
-                  #_(Position-table (:snake model) "Snake")
-                  #_(Position-table (:apples model) "Apples ")))
-    (.getElementById js/document "main")))
 
+           #_(d/div {:style {:display "flex" :alignItems "center" :flexFlow "column"}}
+                  (d/h1 {}
+                        (str "Game over? " (not (:game-running model)) ))
+                  (d/h1 {}
+                        (str "Snake direction: " (-> model :snake-direction name)))
+                  (str "Board: " width " x " height))
+           #_(d/canvas {:id "draw-canvas" :width "400px" :height "400px"} "")
+           #_(d/div {:style {:display "flex" :justifyContent "center"}}
+                  (Position-table (:snake model) "Snake")
+                  (Position-table (:apples model) "Apples ")))
+    (.getElementById js/document "main")))
 
 (defn animate []
   "Main loop"
@@ -232,7 +232,6 @@
 ;; Start the game
 (defonce game-loop
          (do
-
            (go-loop []
                     (<! (timeout speed))
                     (swap! model update-model)
