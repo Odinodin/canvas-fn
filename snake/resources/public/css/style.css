@@ -9,7 +9,6 @@ canvas {
     width: 400px;
 }
 
-
 table {
     width: 5em;
     border-collapse: collapse;
@@ -21,7 +20,7 @@ th, td {
 }
 
 thead {
-    background-color: darkgray;
+    background-color: #b5b5b5;
 }
 
 h1 {

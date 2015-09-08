@@ -80,9 +80,9 @@
                          (when game-key
                            (case game-key
                              :enter (reset-game!)
-                             (swap! model #(turn-snake % game-key)))
-                           )
+                             (swap! model #(turn-snake % game-key))))
                          (recur)))))
+
 
 ;; Rendering
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -90,16 +90,31 @@
 (defmulti draw-cell (fn [ctx cell-value x y cell-width] cell-value))
 
 (defmethod draw-cell :empty [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:grey colors)))
+  (canv/fill-square ctx
+                    [(* y cell-width)
+                     (* x cell-width)]
+                    (- cell-width 2)
+                    (:grey colors)))
 
 (defmethod draw-cell :snake-head [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
+  (canv/fill-square ctx
+                    [(* y cell-width)
+                     (* x cell-width)]
+                    (- cell-width 2)
+                    (:green colors)))
 
 (defmethod draw-cell :snake-body [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:green colors)))
+  (canv/fill-square ctx
+                    [(* y cell-width) (* x cell-width)]
+                    (- cell-width 2)
+                    (:green colors)))
 
 (defmethod draw-cell :apple [ctx cell-value x y cell-width]
-  (canv/fill-square ctx [(* y cell-width) (* x cell-width)] (- cell-width 2) (:red colors)))
+  (canv/fill-square ctx
+                    [(* y cell-width)
+                     (* x cell-width)]
+                    (- cell-width 2)
+                    (:red colors)))
 
 (defn draw-board [canvas model]
   (let [ctx (.getContext canvas "2d")
@@ -119,7 +134,6 @@
       (canv/text-small (.getContext canvas "2d") [40 200] "Press enter to retry" (:dark-grey colors)))))
 
 (defn render-canvas [canvas model]
-  "Clears canvas and draws the model"
   (do
     (canv/init-canvas canvas)
     (draw-board canvas model)
@@ -133,7 +147,6 @@
     :left [(- x 1) y]))
 
 (defn game-over? [model next-coord]
-  "Check if the game is over"
   (or (some neg? next-coord)
       ((fn [[x _]] (>= x width)) next-coord)
       ((fn [[_ y]] (>= y height)) next-coord)
@@ -166,7 +179,6 @@
     model))
 
 (defn eat-apple [model]
-  "Eat an apple if the snake head is on an apple"
   (let [snake-head (last (:snake model))
         apples (:apples model)]
     (if (contains? apples snake-head)
@@ -208,21 +220,20 @@
 (defn render-html [model]
   (q/render
     (d/div {}
-
-           #_(d/div {:style {:display "flex" :alignItems "center" :flexFlow "column"}}
-                  (d/h1 {}
+           (d/div {:style {:display "flex" :alignItems "center" :flexFlow "column"}}
+                  #_(d/h1 {}
                         (str "Game over? " (not (:game-running model)) ))
-                  (d/h1 {}
+                  #_(d/h1 {}
                         (str "Snake direction: " (-> model :snake-direction name)))
-                  (str "Board: " width " x " height))
+                  #_(d/h1 {} (str "Board: " width " x " height)))
            #_(d/canvas {:id "draw-canvas" :width "400px" :height "400px"} "")
-           #_(d/div {:style {:display "flex" :justifyContent "center"}}
-                  (Position-table (:snake model) "Snake")
-                  (Position-table (:apples model) "Apples ")))
+           (d/div {:style {:display "flex" :justifyContent "center"}}
+                  #_(Position-table (:snake model) "Snake")
+                  #_(Position-table (:apples model) "Apples ")))
     (.getElementById js/document "main")))
 
+
 (defn animate []
-  "Main loop"
   (let [data @model]
     (render-html data)
     (when-let [canvas (dom/by-id "draw-canvas")]
