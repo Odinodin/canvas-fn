@@ -28,12 +28,12 @@
 ;; Data to be drawn
 (def width 20)
 (def height 20)
+(def cell-width 20)
 
 (def initial-state {:game-running             true
                     :snake                    [[0 0] [0 1] [0 2]]
                     :snake-direction          :down
                     :previous-snake-direction :down
-                    :cell-width               20
                     :apples                   #{}
                     :growing                  false
                     :board                    (empty-board width height)})
@@ -87,44 +87,26 @@
 ;; Rendering
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmulti draw-cell (fn [ctx cell-value x y cell-width] cell-value))
-
-(defmethod draw-cell :empty [ctx cell-value x y cell-width]
-  (canv/fill-square ctx
-                    [(* y cell-width)
-                     (* x cell-width)]
-                    (- cell-width 2)
-                    (:grey colors)))
-
-(defmethod draw-cell :snake-head [ctx cell-value x y cell-width]
-  (canv/fill-square ctx
-                    [(* y cell-width)
-                     (* x cell-width)]
-                    (- cell-width 2)
-                    (:green colors)))
-
-(defmethod draw-cell :snake-body [ctx cell-value x y cell-width]
-  (canv/fill-square ctx
-                    [(* y cell-width) (* x cell-width)]
-                    (- cell-width 2)
-                    (:green colors)))
-
-(defmethod draw-cell :apple [ctx cell-value x y cell-width]
-  (canv/fill-square ctx
-                    [(* y cell-width)
-                     (* x cell-width)]
-                    (- cell-width 2)
-                    (:red colors)))
+(defn draw-cell [ctx cell-value x y]
+  (->>
+    (cell-value {:apple :red
+                 :snake-body :green
+                 :snake-head :yellow
+                 :empty :grey})
+    colors
+    (canv/fill-square ctx
+                      [(* y cell-width)
+                       (* x cell-width)]
+                      (- cell-width 2))))
 
 (defn draw-board [canvas model]
   (let [ctx (.getContext canvas "2d")
         board-with-snake (reduce (fn [board snake-coord] (assoc-in board snake-coord :snake-body)) (:board model) (:snake model))
         board-with-snake (assoc-in board-with-snake (last (:snake model)) :snake-head)
-        board-with-apples-and-snakes (reduce (fn [board apple-coord] (assoc-in board apple-coord :apple)) board-with-snake (:apples model))
-        cell-width (:cell-width model)]
+        board-with-apples-and-snakes (reduce (fn [board apple-coord] (assoc-in board apple-coord :apple)) board-with-snake (:apples model))]
     (doseq [[row-idx row] (map-indexed (fn [idx row] [idx row]) board-with-apples-and-snakes)]
       (doseq [[col-idx col] (map-indexed (fn [idx col] [idx col]) row)]
-        (draw-cell ctx col col-idx row-idx cell-width)))))
+        (draw-cell ctx col col-idx row-idx)))))
 
 (defn draw-text [canvas model]
   (when-not (:game-running model)
